@@ -33,6 +33,8 @@ import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
 
+import com.dev4evolution.vl.R;
+
 public class ShortcutActivity extends AppCompatActivity {
 
     public static final String EXTRA_ACTION = "action";

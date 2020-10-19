@@ -32,6 +32,9 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.dev4evolution.vl.BuildConfig;
+import com.dev4evolution.vl.R;
+
 public class TrackingService extends Service {
 
     public static final String ACTION_STARTED = "org.traccar.action.SERVICE_STARTED";

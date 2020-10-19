@@ -21,6 +21,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.dev4evolution.vl.R;
+
 public class TrackingController implements PositionProvider.PositionListener, NetworkManager.NetworkHandler {
 
     private static final String TAG = TrackingController.class.getSimpleName();

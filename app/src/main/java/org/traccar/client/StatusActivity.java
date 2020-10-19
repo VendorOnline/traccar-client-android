@@ -29,6 +29,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.dev4evolution.vl.R;
+
 public class StatusActivity extends AppCompatActivity {
 
     private static final int LIMIT = 20;

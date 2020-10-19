@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.traccar.client">
+    package="com.dev4evolution.vl">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -23,7 +23,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name=".MainApplication"
+        android:name="org.traccar.client.MainApplication"
         tools:ignore="GoogleAppIndexingWarning">
 
         <meta-data
@@ -31,12 +31,12 @@
             android:value="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="org.traccar.client.MainActivity"
             android:launchMode="singleTask" />
 
         <activity-alias
             android:name=".Launcher"
-            android:targetActivity=".MainActivity">
+            android:targetActivity="org.traccar.client.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -46,10 +46,10 @@
                 android:resource="@xml/shortcuts" />
         </activity-alias>
 
-        <activity android:name=".StatusActivity"/>
+        <activity android:name="org.traccar.client.StatusActivity"/>
 
         <activity
-            android:name=".ShortcutActivity"
+            android:name="org.traccar.client.ShortcutActivity"
             android:label="@string/menu_shortcuts">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,13 +58,13 @@
         </activity>
 
         <service
-            android:name=".TrackingService"
+            android:name="org.traccar.client.TrackingService"
             android:foregroundServiceType="location" />
 
         <service
-            android:name=".TrackingService$HideNotificationService" />
+            android:name="org.traccar.client.TrackingService$HideNotificationService" />
 
-        <receiver android:name=".AutostartReceiver">
+        <receiver android:name="org.traccar.client.AutostartReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

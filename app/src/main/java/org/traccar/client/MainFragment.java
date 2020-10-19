@@ -47,6 +47,9 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.TwoStatePreference;
 
+import com.dev4evolution.vl.BuildConfig;
+import com.dev4evolution.vl.R;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;

@@ -30,6 +30,8 @@ import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.multidex.MultiDexApplication;
 
+import com.dev4evolution.vl.R;
+
 public class MainApplication extends MultiDexApplication {
 
     public static final String PRIMARY_CHANNEL = "default";

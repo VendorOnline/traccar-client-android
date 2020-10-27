@@ -47,6 +47,7 @@ public class TrackingService extends Service {
     private TrackingController trackingController;
 
     private static Notification createNotification(Context context) {
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, MainApplication.PRIMARY_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

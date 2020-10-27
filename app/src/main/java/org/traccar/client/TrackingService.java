@@ -50,15 +50,16 @@ public class TrackingService extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, MainApplication.PRIMARY_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_notify)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE);
-        Intent intent;
-        if (!BuildConfig.HIDDEN_APP) {
+            Intent intent;
+            if (!BuildConfig.HIDDEN_APP) {
             intent = new Intent(context, MainActivity.class);
             builder
-                .setContentTitle(context.getString(R.string.settings_status_on_summary))
-                .setTicker(context.getString(R.string.settings_status_on_summary))
-                .setColor(ContextCompat.getColor(context, R.color.primary_dark));
+                    .setContentTitle(context.getString(R.string.settings_status_on_summary))
+                    .setContentText(context.getString(R.string.settings_status_on_summary))
+                    .setTicker(context.getString(R.string.settings_status_on_summary))
+                    .setColor(ContextCompat.getColor(context, R.color.light));
         } else {
             intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
         }
@@ -74,8 +75,8 @@ public class TrackingService extends Service {
 
         @Override
         public void onCreate() {
-            startForeground(NOTIFICATION_ID, createNotification(this));
-            stopForeground(true);
+            //startForeground(NOTIFICATION_ID, createNotification(this));
+            //stopForeground(true);
         }
 
         @Override

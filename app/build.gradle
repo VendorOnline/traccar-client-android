@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/joyola/Documents/GitHub/VendorOnline/traccar-client-android/vendor-locator.p12')
+            keyAlias 'key0'
+            storePassword 'vendorlocator'
+            keyPassword 'vendorlocator'
+        }
+    }
     compileSdkVersion 29
 
     defaultConfig {
@@ -8,9 +16,10 @@ android {
         buildConfigField 'boolean', 'HIDDEN_APP', 'false'
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 67
-        versionName '6.7'
+        versionCode 700
+        versionName '7.0.0'
         multiDexEnabled true
+        signingConfig signingConfigs.release
     }
 
     compileOptions {
@@ -31,7 +40,9 @@ android {
         regular {
             isDefault = true
         }
-        google
+        google {
+
+        }
         hidden {
             applicationId 'org.traccar.client.hidden'
             buildConfigField 'boolean', 'HIDDEN_APP', 'true'

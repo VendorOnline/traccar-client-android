@@ -23,39 +23,28 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
-import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.webkit.URLUtil;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
-import androidx.preference.EditTextPreference;
-import androidx.preference.EditTextPreferenceDialogFragmentCompat;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.TwoStatePreference;
 
 import com.dev4evolution.vl.BuildConfig;
 import com.dev4evolution.vl.R;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 public class MainFragment extends PreferenceFragmentCompat {
 
@@ -72,9 +61,7 @@ public class MainFragment extends PreferenceFragmentCompat {
     public static final String KEY_STATUS = "status";
     public static final String KEY_BUFFER = "buffer";
     public static final String KEY_WAKELOCK = "wakelock";
-
-    private static final int PERMISSIONS_REQUEST_PHONE = 1;
-    private static final int PERMISSIONS_REQUEST_LOCATION = 2;
+    private static final int PERMISSIONS_REQUEST_LOCATION = 1;
 
     private SharedPreferences sharedPreferences;
 
@@ -92,26 +79,70 @@ public class MainFragment extends PreferenceFragmentCompat {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        Set<String> requiredPermissions = new HashSet<>();
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requiredPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
-        }
-        boolean permission = requiredPermissions.isEmpty();
-        if (!permission) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(requiredPermissions.toArray(new String[requiredPermissions.size()]), PERMISSIONS_REQUEST_LOCATION);
+        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                AdvertisingIdClient.Info idInfo = null;
+                try {
+                    idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
+                } catch (Exception e) {
+                    // IGNORE
+                }
+                String deviceId = null;
+                try{
+                    deviceId = idInfo.getId();
+                }catch (NullPointerException e){
+                    deviceId = UUID.randomUUID().toString();
+                }
+                return deviceId;
             }
-            return;
-        }
 
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_PHONE);
-        } else {
-            startService();
-        }
+            @Override
+            protected void onPostExecute(String deviceId) {
+                // SETUP APPLICATION
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(KEY_URL, "http://143.202.96.242:3390");
+                editor.putString(KEY_DEVICE, deviceId);
+                editor.putString(KEY_ACCURACY, "high");
+                editor.putString(KEY_INTERVAL, "60");
+                editor.putString(KEY_DISTANCE, "0");
+                editor.putString(KEY_ANGLE, "0");
+                editor.putBoolean(KEY_BUFFER, true);
+                editor.putBoolean(KEY_WAKELOCK, true);
+                editor.putBoolean(KEY_STATUS, true);
+                editor.apply();
+
+                // SET STATUS AS TRUE
+                TwoStatePreference preference = findPreference(KEY_STATUS);
+                preference.setChecked(true);
+
+                // SET SUMMARY
+                findPreference(KEY_DEVICE).setSummary(sharedPreferences.getString(KEY_DEVICE, null));
+                findPreference(KEY_URL).setSummary(sharedPreferences.getString(KEY_URL, null));
+                findPreference(KEY_ACCURACY).setSummary(sharedPreferences.getString(KEY_ACCURACY, null));
+                findPreference(KEY_INTERVAL).setSummary(sharedPreferences.getString(KEY_INTERVAL, null));
+                findPreference(KEY_DISTANCE).setSummary(sharedPreferences.getString(KEY_DISTANCE, null));
+                findPreference(KEY_ANGLE).setSummary(sharedPreferences.getString(KEY_ANGLE, null));
+
+                // START SERVICE
+                Set<String> requiredPermissions = new HashSet<>();
+                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requiredPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+                }
+                boolean permission = requiredPermissions.isEmpty();
+                if (!permission) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(requiredPermissions.toArray(new String[requiredPermissions.size()]), PERMISSIONS_REQUEST_LOCATION);
+                    }
+                    return;
+                }
+                startService();
+            }
+        };
+        task.execute();
     }
 
     private void removeLauncherIcon() {
@@ -155,49 +186,14 @@ public class MainFragment extends PreferenceFragmentCompat {
             }
         }
         if(granted) {
-            if (requestCode == PERMISSIONS_REQUEST_PHONE) {
-                startService();
-            }
-
             if (requestCode == PERMISSIONS_REQUEST_LOCATION) {
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_PHONE);
-                } else {
-                    startService();
-                }
+                startService();
             }
         }
     }
 
     @SuppressLint("MissingPermission")
     public void startService() {
-        // SETUP APPLICATION
-        String ts = Context.TELEPHONY_SERVICE;
-        TelephonyManager mTelephonyMgr = (TelephonyManager) getContext().getSystemService(ts);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_DEVICE, mTelephonyMgr.getDeviceId());
-        editor.putString(KEY_URL, "http://143.202.96.242:3390");
-        editor.putString(KEY_ACCURACY, "high");
-        editor.putString(KEY_INTERVAL, "60");
-        editor.putString(KEY_DISTANCE, "0");
-        editor.putString(KEY_ANGLE, "0");
-        editor.putBoolean(KEY_BUFFER, true);
-        editor.putBoolean(KEY_WAKELOCK, true);
-        editor.putBoolean(KEY_STATUS, true);
-        editor.apply();
-
-        // SET STATUS AS TRUE
-        TwoStatePreference preference = findPreference(KEY_STATUS);
-        preference.setChecked(true);
-
-        // SET SUMMARY
-        findPreference(KEY_DEVICE).setSummary(sharedPreferences.getString(KEY_DEVICE, null));
-        findPreference(KEY_URL).setSummary(sharedPreferences.getString(KEY_URL, null));
-        findPreference(KEY_ACCURACY).setSummary(sharedPreferences.getString(KEY_ACCURACY, null));
-        findPreference(KEY_INTERVAL).setSummary(sharedPreferences.getString(KEY_INTERVAL, null));
-        findPreference(KEY_DISTANCE).setSummary(sharedPreferences.getString(KEY_DISTANCE, null));
-        findPreference(KEY_ANGLE).setSummary(sharedPreferences.getString(KEY_ANGLE, null));
-
         // START TRACKING
         alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         alarmIntent = PendingIntent.getBroadcast(getActivity(), 0, new Intent(getActivity(), AutostartReceiver.class), 0);

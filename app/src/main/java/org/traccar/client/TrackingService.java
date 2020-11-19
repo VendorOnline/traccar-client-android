@@ -15,6 +15,7 @@
  */
 package org.traccar.client;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -75,8 +76,10 @@ public class TrackingService extends Service {
 
         @Override
         public void onCreate() {
-            //startForeground(NOTIFICATION_ID, createNotification(this));
-            //stopForeground(true);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//                startForeground(NOTIFICATION_ID, createNotification(this));
+//                stopForeground(true);
+//            }
         }
 
         @Override
